@@ -1,4 +1,4 @@
-# apex-geocoding-and-address-validation
+# APEX Geocoding and Address Validation Demo
 Sample application demonstrating 3 options for geocoding and address validation in Oracle APEX. 
 
 - APEX Geocoded Address Item
