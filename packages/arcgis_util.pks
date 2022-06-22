@@ -1,6 +1,6 @@
 create or replace package arcgis_util authid definer as
 --
--- This is the base URL used in all API requests
+-- This is the base URL used in all ArcGIS API requests
 --
    k_base_url constant varchar2(100 char) := 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/';
 
@@ -39,6 +39,10 @@ create or replace package arcgis_util authid definer as
 --                        syntax is used, the spatial reference of the coordinates must be WGS84; otherwise,
 --                        the spatial reference of the point coordinates can be defined in the JSON object.
 --                        Example using simple syntax(WGS84): p_location => '-117.196,34.056'
+--
+-- * p_max_suggestions    Maximum number of suggestions to return, default is 5. Max is 15.
+--
+-- * p_country_code       2 or 3 digit ISO country code, i.e. 'USA' 
 --==========================================================================================================
    function suggest(
       p_text                   in varchar2
@@ -46,7 +50,7 @@ create or replace package arcgis_util authid definer as
     , p_category               in varchar2 default null
     , p_search_extent          in varchar2 default null
     , p_max_suggestions        in number default 5 --max 15
-    , p_country_code           in varchar2 default null --2 or 3 digit ISO country code, i.e. 'USA'
+    , p_country_code           in varchar2 default null 
     , p_preferred_label_values in varchar2 default null --Either 'postalCity' or 'localCity'
     , p_format                 in varchar2 default 'json'  --Formats: json,pjson
    ) return clob;
@@ -130,7 +134,22 @@ create or replace package arcgis_util authid definer as
       p_json in clob
    ) return t_address_candidate_type pipelined deterministic;
    
-   --https://developers.arcgis.com/rest/geocode/api-reference/geocoding-find-address-candidates.htm
+--==========================================================================================================
+-- Calls the findAdddressCandidates API and returns a list of possible matches. See docs for full list and 
+-- description of all returned fields.
+--
+-- Docs: https://developers.arcgis.com/rest/geocode/api-reference/geocoding-find-address-candidates.htm
+--
+-- Parameters:
+-- * p_singleline               Specifies the location to be geocoded. This can be a street address, place-name,
+--                              postal code, or POI. The input address components need to be formatted as a
+--                              single string.
+--
+-- * p_magic_key                Magic Key from suggest API.          
+
+--                        
+--==========================================================================================================
+
    function find_address_candidates (
       p_singleline     in  varchar2 default null --max length 200
     , p_magic_key      in  varchar2 default null
